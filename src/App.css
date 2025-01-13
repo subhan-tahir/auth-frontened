@@ -1,0 +1,37 @@
+/*Change text in autofill textbox*/
+
+input:-webkit-autofill
+ {
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+}
+
+.notfound h1{
+     font-family: 'Fredoka One', cursive;
+}
+.notfound h2{
+    font-family: 'Raleway', sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: #222;
+    margin: 0;
+}
+
+
+input[type='checkbox'] {
+    
+    position: relative;
+    top: 4px;
+    width: 20px;
+    height: 20px;
+    background-image: url('src/assets/check-mark-sign-svgrepo-com.svg');
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+    accent-color:black;
+    border: 0;
+    
+
+}
+.MuiPaper-root{
+    justify-content: center;
+}
