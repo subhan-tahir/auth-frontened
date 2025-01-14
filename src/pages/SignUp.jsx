@@ -46,7 +46,7 @@ const SignUp = () => {
     }
 
     try {
-      const signupResponse = await axios.post('https://auth-backend-x4gf.vercel.app/employees', { username, email, password });
+      const signupResponse = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, { username, email, password });
       console.log(signupResponse)
       const getusernameFromresponse = signupResponse;
       console.log(getusernameFromresponse)
