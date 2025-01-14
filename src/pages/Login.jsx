@@ -16,7 +16,7 @@ const Login = () => {
     const [isOnline, setIsOnline] = useState(navigator.onLine); // Initial network status
 
     const navigate = useNavigate();
-
+    console.log("ENV ==== ",import.meta.env.VITE_APP_BACKEND_BASE_URL)
     const validateForm = () => {
         const newErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
