@@ -5,6 +5,7 @@ import { FaExclamationCircle } from 'react-icons/fa';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
+import { CircularProgress } from '@mui/material'; // Material UI spinner
 import axios from 'axios';
 
 const Login = () => {
@@ -13,10 +14,12 @@ const Login = () => {
     const [errors, setErrors] = useState({});
     const [formSubmitted, setFormSubmitted] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [isOnline, setIsOnline] = useState(navigator.onLine); // Initial network status
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+    const [isLoading, setIsLoading] = useState(false); // Spinner state
 
     const navigate = useNavigate();
-    console.log("ENV ==== ",import.meta.env.VITE_APP_BACKEND_BASE_URL)
+    console.log("ENV ==== ", import.meta.env.VITE_APP_BACKEND_BASE_URL);
+
     const validateForm = () => {
         const newErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,22 +54,23 @@ const Login = () => {
             return;
         }
 
+        setIsLoading(true); // Start spinner
         try {
             const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/login`, { email, password });
 
-            if (response?.data?.success) {
-                const username = response.data.data.username; // Assuming `username` is in the `data`
+            if (response.status === 200) {
+                const username = response.data.data.username;
                 console.log('Login successful:', username);
-                localStorage.setItem('username', username); // Save username to localStorage
-                navigate('/'); // Redirect to home page
+                localStorage.setItem('username', username);
+                navigate('/');
             } else {
                 setErrors({ general: response.data.msg || 'Invalid login details' });
             }
         } catch (error) {
+            setErrors({ general: 'Invalid email or password.' });
             console.error('Login failed:', error);
-            setErrors({
-                general: 'Invalid email or password.',
-            });
+        } finally {
+            setIsLoading(false); // Stop spinner
         }
     };
 
@@ -75,7 +79,6 @@ const Login = () => {
     };
 
     useEffect(() => {
-        // Online and offline events to detect changes in the network status dynamically:
         const updateOnlineStatus = () => setIsOnline(navigator.onLine);
 
         window.addEventListener('online', updateOnlineStatus);
@@ -89,7 +92,6 @@ const Login = () => {
 
     return (
         <div className="flex w-full flex-row h-full gap-5 overflow-hidden items-center">
-            {/* Auth Sidebar */}
             <section className="h-full md:flex hidden">
                 <div className="w-[400px] h-screen">
                     <video
@@ -102,19 +104,16 @@ const Login = () => {
                 </div>
             </section>
 
-            {/* Auth Content */}
             <section className="flex-1 h-full ml-auto p-2">
                 <div className="flex">
                     <div className="signup-form max-w-[600px] w-full md:ml-10 ml-0 mr-auto md:px-10 p-2">
                         <form onSubmit={submitHandler}>
-                            {/* Network Status */}
                             {!isOnline && (
                                 <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">
                                     You are offline. Please check your internet connection.
                                 </div>
                             )}
 
-                            {/* General Error */}
                             {errors.general && (
                                 <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">
                                     {errors.general}
@@ -125,7 +124,6 @@ const Login = () => {
                                 <h1>Log In Now</h1>
                             </div>
 
-                            {/* Email Field */}
                             <div className="form-field py-3">
                                 <label htmlFor="email" className="font-bold text-[20px] pb-5">
                                     Email
@@ -154,7 +152,6 @@ const Login = () => {
                                 {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                             </div>
 
-                            {/* Password Field */}
                             <div className="form-field py-3">
                                 <label htmlFor="password" className="font-bold text-[20px] pb-5">
                                     Password
@@ -190,18 +187,16 @@ const Login = () => {
                                 )}
                             </div>
 
-                            {/* Submit Button */}
                             <div className="py-3">
                                 <button
                                     type="submit"
-                                    className="bg-black rounded-[30px] text-center text-white h-[58px] text-[18px] font-bold w-full"
-                                    disabled={!isOnline}
+                                    className="bg-black rounded-[30px] text-center text-white h-[58px] text-[18px] font-bold w-full flex items-center justify-center"
+                                    disabled={!isOnline || isLoading}
                                 >
-                                    Log In
+                                    {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Log In'}
                                 </button>
                             </div>
 
-                            {/* Sign-Up Link */}
                             <div>
                                 <p className="text-center text-lg text-gray-600 mt-1">
                                     Don't have an account?{' '}
