@@ -53,8 +53,8 @@ const Login = () => {
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/login`, { email, password });
-
-            if (response?.data?.success) {
+           
+            if (response.status === 200) {
                 const username = response.data.data.username; // Assuming `username` is in the `data`
                 console.log('Login successful:', username);
                 localStorage.setItem('username', username); // Save username to localStorage
@@ -63,10 +63,10 @@ const Login = () => {
                 setErrors({ general: response.data.msg || 'Invalid login details' });
             }
         } catch (error) {
-            console.error('Login failed:', error);
             setErrors({
                 general: 'Invalid email or password.',
             });
+            console.error('Login failed:', error);
         }
     };
 
