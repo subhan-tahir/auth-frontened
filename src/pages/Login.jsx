@@ -196,7 +196,7 @@ const Login = () => {
         }`}
         disabled={isLoading || !isOnline} // Disable the button when loading
     >
-        {loading ? (
+        {isLoading ? (
             <CircularProgress size={24} color="inherit" /> // Show spinner
         ) : (
             'Log In' // Default button text
