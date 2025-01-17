@@ -60,7 +60,7 @@ const Login = () => {
             const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/login`, { email, password });
              
             if (response?.data?.success) {
-                setIsLoading(false);
+                
                 const username = response.data.data.username; // Assuming `username` is in the `data`
                 console.log('Login successful:', username);
                 localStorage.setItem('username', username);
@@ -74,6 +74,9 @@ const Login = () => {
                 general: 'Invalid email or password.',
             });
         }
+        finally {
+        setIsLoading(false); // Ensure the loader is stopped in all cases
+    }
     };
 
     const passwordVisibilityHandler = () => {
