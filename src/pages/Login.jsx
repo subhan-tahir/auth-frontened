@@ -18,7 +18,6 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false); // Spinner state
 
     const navigate = useNavigate();
-    console.log("ENV ==== ", import.meta.env.VITE_APP_BACKEND_BASE_URL);
 
     const validateForm = () => {
         const newErrors = {};
@@ -40,6 +39,7 @@ const Login = () => {
     };
 
     const submitHandler = async (e) => {
+    console.log("ENV ==== ", import.meta.env.VITE_APP_BACKEND_BASE_URL);
         e.preventDefault();
         setFormSubmitted(true);
 
