@@ -194,7 +194,7 @@ const Login = () => {
         className={`bg-black rounded-[30px] text-center text-white h-[58px] text-[18px] font-bold w-full flex items-center justify-center ${
             isLoading ? 'opacity-50 cursor-not-allowed' : ''
         }`}
-        disabled={isLoading || !isonline} // Disable the button when loading
+        disabled={isLoading || !isOnline} // Disable the button when loading
     >
         {loading ? (
             <CircularProgress size={24} color="inherit" /> // Show spinner
