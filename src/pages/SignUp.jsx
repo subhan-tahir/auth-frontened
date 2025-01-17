@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import authVideo from '../assets/signupFormVideo.mp4';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaExclamationCircle } from 'react-icons/fa';
@@ -6,7 +6,7 @@ import { FaCircleCheck } from 'react-icons/fa6';
 import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
 import axios from 'axios';
-
+import { CircularProgress } from '@mui/material'; // Material UI spinner
 
 const SignUp = () => {
   const [username, setUserName] = useState('');
@@ -14,7 +14,9 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const[passwordVisible,setPasswordVisible] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
   const homePage = useNavigate();
 
   const validateForm = () => {
@@ -38,6 +40,10 @@ const SignUp = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     setFormSubmitted(true);
+    if (!isOnline) {
+      setErrors({ general: 'No internet connection. Please check your network.' });
+      return;
+  }
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
@@ -46,28 +52,47 @@ const SignUp = () => {
     }
 
     try {
+      setIsLoading(true)
       const signupResponse = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, { username, email, password });
       console.log(signupResponse)
       const getusernameFromresponse = signupResponse;
-      console.log(getusernameFromresponse)
+      console.log(getusernameFromresponse.data)
+      console.log(signupResponse.data.success)
       if (signupResponse.data.success) {
-        console.log(signupResponse)
+
         homePage('/');
-      } else {
-        setErrors({emailExist:'An account with that email address already exists. Please log in to continue.',email:'Invalid email',password:'Invaild password'})
-        
+      } 
+      else {
+        setErrors({ emailExist: 'An account with that email address already exists. Please log in to continue.', email: 'Invalid email', password: 'Invaild password' })
+
       }
     } catch (error) {
       console.error('Registration failed:', error);
       setErrors({
-        email:'',
-        password:''
+        email: '',
+        password: ''
       })
     }
+    finally {
+      setIsLoading(false);
+    }
   };
-let passwordVisibilityHandler= ()=>{
-setPasswordVisible(!passwordVisible)
-}
+  let passwordVisibilityHandler = () => {
+    setPasswordVisible(!passwordVisible)
+  }
+
+  useEffect(() => {
+          const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+  
+          window.addEventListener('online', updateOnlineStatus);
+          window.addEventListener('offline', updateOnlineStatus);
+  
+          return () => {
+              window.removeEventListener('online', updateOnlineStatus);
+              window.removeEventListener('offline', updateOnlineStatus);
+          };
+      }, []);
+
   return (
     <>
       <div className="flex w-full items-center flex-row relative gap-5 h-screen">
@@ -88,11 +113,11 @@ setPasswordVisible(!passwordVisible)
           <div className="flex h-full">
             <div className="signup-form h-full max-w-[600px] w-full md:ml-10 ml-0 mr-auto md:px-10 md:p-2">
               <form onSubmit={submitHandler}>
-              {errors.emailExist && (
-                                <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">
-                                    {errors.emailExist}
-                                </div>
-                            )}
+                {errors.emailExist && (
+                  <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">
+                    {errors.emailExist}
+                  </div>
+                )}
                 <div className="md:py-6 py-1 md:mt-0 -mt-4  text-[2rem] underline text-center font-bold text-black">
                   <h1>Sign Up Now</h1>
                 </div>
@@ -103,9 +128,8 @@ setPasswordVisible(!passwordVisible)
                       Username
                     </label>
                     <div
-                      className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${
-                        errors.username ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
-                      }`}
+                      className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${errors.username ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
+                        }`}
                     >
                       <input
                         type="text"
@@ -133,9 +157,8 @@ setPasswordVisible(!passwordVisible)
                     Email
                   </label>
                   <div
-                    className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${
-                      errors.email ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
-                    }`}
+                    className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${errors.email ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
+                      }`}
                   >
                     <input
                       type="text"
@@ -144,7 +167,7 @@ setPasswordVisible(!passwordVisible)
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
-                  
+
                     {formSubmitted && (
                       <span className="pl-2 text-xl">
                         {errors.email ? (
@@ -163,18 +186,17 @@ setPasswordVisible(!passwordVisible)
                     Password
                   </label>
                   <div
-                    className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${
-                      errors.password ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
-                    }`}
+                    className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${errors.password ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
+                      }`}
                   >
                     <input
-                      type={`${passwordVisible ? 'text':'password'}`}
+                      type={`${passwordVisible ? 'text' : 'password'}`}
                       id="password"
                       className="border-0 outline-none w-full"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
-                      <span className='cursor-pointer text-xl ' onClick={passwordVisibilityHandler}>{passwordVisible ? (<IoEye />):(<FaEyeSlash/>)}</span>
+                    <span className='cursor-pointer text-xl ' onClick={passwordVisibilityHandler}>{passwordVisible ? (<IoEye />) : (<FaEyeSlash />)}</span>
                     {formSubmitted && (
                       <span className="pl-2 text-xl">
                         {errors.password ? (
@@ -201,8 +223,10 @@ setPasswordVisible(!passwordVisible)
                 </div>
                 {/* Submit Button */}
                 <div className="py-3">
-                  <button className="bg-black rounded-[30px] text-center text-white h-[58px] text-[18px] font-bold w-full">
-                    Create Account
+                  <button className={`bg-black rounded-[30px] text-center text-white h-[58px] text-[18px] font-bold w-full 
+                    ${isLoading ? 'opacity-50 cursor-not-allowed ' : ''}`}
+                    disabled={isLoading || !isOnline} >
+                    {isLoading ? <CircularProgress  size={24} color="inherit"/> : 'Create Account'}
                   </button>
                 </div>
                 <div>
@@ -218,7 +242,7 @@ setPasswordVisible(!passwordVisible)
           </div>
         </section>
       </div>
-      
+
     </>
   );
 };
