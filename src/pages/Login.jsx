@@ -58,8 +58,9 @@ const Login = () => {
         setIsLoading(true); // Start spinner
              await new Promise((resolve) => setTimeout(resolve, 2000)); 
             const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/login`, { email, password });
-             setIsLoading(false);
+             
             if (response?.data?.success) {
+                setIsLoading(false);
                 const username = response.data.data.username; // Assuming `username` is in the `data`
                 console.log('Login successful:', username);
                 localStorage.setItem('username', username);
