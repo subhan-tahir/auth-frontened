@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useContext } from 'react';
 import authVideo from '../assets/signupFormVideo.mp4';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaExclamationCircle } from 'react-icons/fa';
@@ -7,6 +7,7 @@ import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
 import axios from 'axios';
 import { CircularProgress } from '@mui/material'; // Material UI spinner
+import { ThemeContext } from '@emotion/react';
 
 const SignUp = () => {
   const [username, setUserName] = useState('');
@@ -18,7 +19,7 @@ const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
     const [isOnline, setIsOnline] = useState(navigator.onLine);
   const homePage = useNavigate();
-
+ const {theme} =  useContext(ThemeContext);
   const validateForm = () => {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,40 +44,43 @@ const SignUp = () => {
     if (!isOnline) {
       setErrors({ general: 'No internet connection. Please check your network.' });
       return;
-  }
+    }
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       console.log('Form not validated', formErrors);
       return;
     }
-
+  
     try {
-      setIsLoading(true)
-      const signupResponse = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, { username, email, password });
-      console.log(signupResponse)
-      const getusernameFromresponse = signupResponse;
-      console.log(getusernameFromresponse.data)
-      console.log(signupResponse.data.success)
-      if (signupResponse.data.success) {
-
+      setIsLoading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`,{ username, email, password });
+  
+      if (response.status === 200 || response.status === 201) {
         homePage('/');
-      } 
-      else {
-        setErrors({ emailExist: 'An account with that email address already exists. Please log in to continue.', email: 'Invalid email', password: 'Invaild password' })
-
+      } else {
+        setErrors({
+          emailExist: response.data.msg || 'An account with that email address already exists. Please log in to continue.',
+        });
       }
     } catch (error) {
       console.error('Registration failed:', error);
-      setErrors({
-        email: '',
-        password: ''
-      })
-    }
-    finally {
+  
+      if (error.response.status === 400) {
+        setErrors({
+          emailExist: error.response.data.msg,
+        });
+      } else {
+        setErrors({
+          general: 'Something went wrong. Please try again later.',
+        });
+      }
+    } finally {
       setIsLoading(false);
     }
   };
+  
   let passwordVisibilityHandler = () => {
     setPasswordVisible(!passwordVisible)
   }
@@ -134,7 +138,7 @@ const SignUp = () => {
                       <input
                         type="text"
                         id="username"
-                        className="border-0 outline-none w-full"
+                        className="border-0 outline-none w-full bg-transparent"
                         value={username}
                         onChange={(e) => setUserName(e.target.value)}
                       />
@@ -163,7 +167,7 @@ const SignUp = () => {
                     <input
                       type="text"
                       id="email"
-                      className="border-0 outline-none w-full"
+                      className="border-0 outline-none w-full bg-transparent"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -192,7 +196,7 @@ const SignUp = () => {
                     <input
                       type={`${passwordVisible ? 'text' : 'password'}`}
                       id="password"
-                      className="border-0 outline-none w-full"
+                      className="border-0 outline-none w-full bg-transparent"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
@@ -216,23 +220,23 @@ const SignUp = () => {
                     id="user_agree_to_terms"
                     className="signup-checkbox"
                   />
-                  <label htmlFor="user_agree_to_terms" className="text-[#0d0c22] m-0">
+                  <label htmlFor="user_agree_to_terms" className=" m-0">
                     I agree with devop's Terms of Service, Privacy Policy, and default
                     Notification Settings.
                   </label>
                 </div>
                 {/* Submit Button */}
                 <div className="py-3">
-                  <button className={`bg-black rounded-[30px] text-center text-white h-[58px] text-[18px] font-bold w-full 
+                  <button className={`${theme === 'light' ? 'bg-black text-white'  :'bg-white text-black'} rounded-[30px] text-center  h-[58px] text-[18px] font-bold w-full 
                     ${isLoading ? 'opacity-50 cursor-not-allowed ' : ''}`}
                     disabled={isLoading || !isOnline} >
                     {isLoading ? <CircularProgress  size={24} color="inherit"/> : 'Create Account'}
                   </button>
                 </div>
                 <div>
-                  <p className="text-center text-lg text-gray-600 mt-1">
+                  <p className="text-center text-lg  mt-1">
                     Already have an account?{' '}
-                    <Link to={'/login'} className="text-black underline">
+                    <Link to={'/login'} className=" underline">
                       Log In
                     </Link>
                   </p>

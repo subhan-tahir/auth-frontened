@@ -7,6 +7,8 @@ import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
 import { CircularProgress } from '@mui/material'; // Material UI spinner
 import axios from 'axios';
+import { useContext } from 'react';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Login = () => {
     const [password, setPassword] = useState('');
@@ -18,7 +20,7 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false); // Spinner state
 
     const navigate = useNavigate();
-
+    const { theme } = useContext(ThemeContext);
     const validateForm = () => {
         const newErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,7 +41,7 @@ const Login = () => {
     };
 
     const submitHandler = async (e) => {
-    console.log("ENV ==== ", import.meta.env.VITE_APP_BACKEND_BASE_URL);
+        console.log("ENV ==== ", import.meta.env.VITE_APP_BACKEND_BASE_URL);
         e.preventDefault();
         setFormSubmitted(true);
 
@@ -55,13 +57,12 @@ const Login = () => {
         }
 
         try {
-        setIsLoading(true); // Start spinner
-             await new Promise((resolve) => setTimeout(resolve, 2000)); 
+            setIsLoading(true); // Start spinner
+            //  await new Promise((resolve) => setTimeout(resolve, 2000)); 
             const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/login`, { email, password });
-             
+
             if (response?.data?.success) {
-                
-                const username = response.data.data.username; // Assuming `username` is in the `data`
+                const username = response.data.data.username;
                 console.log('Login successful:', username);
                 localStorage.setItem('username', username);
                 navigate('/');
@@ -70,13 +71,16 @@ const Login = () => {
             }
         } catch (error) {
             console.error('Login failed:', error);
+
+
             setErrors({
-                general: 'Invalid email or password.',
+                general: 'Invalid email and password',
             });
+
         }
         finally {
-        setIsLoading(false); // Ensure the loader is stopped in all cases
-    }
+            setIsLoading(false); // Ensure the loader is stopped in all cases
+        }
     };
 
     const passwordVisibilityHandler = () => {
@@ -139,7 +143,7 @@ const Login = () => {
                                     <input
                                         type="text"
                                         id="email"
-                                        className="border-0 outline-none w-full"
+                                        className="border-0 outline-none w-full bg-transparent"
                                         value={email}
                                         autoComplete="on"
                                         onChange={(e) => setEmail(e.target.value)}
@@ -167,7 +171,7 @@ const Login = () => {
                                     <input
                                         type={passwordVisible ? 'text' : 'password'}
                                         id="password"
-                                        className="border-0 outline-none w-full"
+                                        className="border-0 outline-none w-full bg-transparent"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                     />
@@ -193,26 +197,25 @@ const Login = () => {
                             </div>
 
                             <div className="py-3">
-                              <button
-        type="submit"
-        className={`bg-black rounded-[30px] text-center text-white h-[58px] text-[18px] font-bold w-full flex items-center justify-center ${
-            isLoading ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
-        disabled={isLoading || !isOnline} 
-    >
-        {isLoading ? (
-            <CircularProgress size={24} color="inherit" /> 
-        ) : (
-            'Log In'
-        )}
-    </button>
+                                <button
+                                    type="submit"
+                                    className={`${theme === 'light' ? 'bg-black text-white' : 'bg-white text-black'} rounded-[30px] text-center h-[58px] text-[18px] font-bold w-full flex items-center justify-center ${isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                                        }`}
+                                    disabled={isLoading || !isOnline}
+                                >
+                                    {isLoading ? (
+                                        <CircularProgress size={24} color={`${theme === 'light' ? 'black' : 'white'}`} />
+                                    ) : (
+                                        'Log In'
+                                    )}
+                                </button>
 
                             </div>
 
                             <div>
-                                <p className="text-center text-lg text-gray-600 mt-1">
+                                <p className="text-center text-lg  mt-1">
                                     Don't have an account?{' '}
-                                    <Link to="/signup" className="text-black underline">
+                                    <Link to="/signup" className=" underline">
                                         Sign up
                                     </Link>
                                 </p>

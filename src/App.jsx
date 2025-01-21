@@ -12,8 +12,11 @@ const App = () => {
   {/* <Home header={'Home'} des={'Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem repellat iste debitis doloremque amet perspiciatis enim animi veniam vitae dolor.'}/> */}
   
   {/* <Login /> */}
+
   <Sidebar />
   <Router />
+
+  
   </>
   )
 }

@@ -1,44 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { styled } from '@mui/material/styles';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     Card,
     CardHeader,
     CardMedia,
     CardContent,
-    CardActions,
-    Collapse,
-    IconButton,
     Typography,
     Box,
     LinearProgress,
-    Avatar,
     Skeleton,
     Stack
 } from '@mui/material';
-
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import zIndex from '@mui/material/styles/zIndex';
-
-const ExpandMore = styled(IconButton, {
-    shouldForwardProp: (prop) => prop !== 'expand',
-})(({ theme, expand }) => ({
-    marginLeft: 'auto',
-    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-    transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-    }),
-}));
+import { ThemeContext } from './context/ThemeContext';
 
 const ProductCard = () => {
-    // const [expandedCard, setExpandedCard] = useState(null); // Track the expanded card index
     const [products, setProducts] = useState([]);
     const [loader, setLoader] = useState(false);
     const [itemShow, setItemShow] = useState(5);
-    // const handleExpandClick = (index) => {
-    //     setExpandedCard((prev) => (prev === index ? null : index));
-    // };
 
+    const {theme} = useContext(ThemeContext);
     const fetchProducts = async () => {
         setLoader(true)
         const response = await axios.get('https://api.escuelajs.co/api/v1/products');
@@ -121,7 +102,7 @@ const ProductCard = () => {
                 {
                     products.length <= itemShow ?
                         null
-                        : (<button onClick={() => setItemShow(itemShow + 4)} className='text-white block m-auto  mt-3 bg-black p-3 rounded-full '>Show more</button>)
+                        : (<button onClick={() => setItemShow(itemShow + 4)} className={` block font-bold m-auto  mt-3 p-3 rounded-full ${theme === 'light' ? 'bg-black text-white':'bg-white text-black'}`}>Show more</button>)
                 }
             </div>
 
