@@ -53,11 +53,14 @@ const SignUp = () => {
     }
   
     try {
-      setIsLoading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`,{ username, email, password });
-  
-      if (response.status === 200 || response.status === 201) {
+      setIsLoading(true)
+      const signupResponse = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, { username, email, password });
+      console.log(signupResponse)
+      const getusernameFromresponse = signupResponse;
+      console.log(getusernameFromresponse.data)
+      console.log(signupResponse.data.success)
+      if (signupResponse.data.success) {
+
         homePage('/');
       } else {
         setErrors({
