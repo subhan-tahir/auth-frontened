@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import authVideo from '../assets/signupFormVideo.mp4';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaExclamationCircle } from 'react-icons/fa';
@@ -17,9 +17,9 @@ const SignUp = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-    const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const homePage = useNavigate();
- const {theme} =  useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const validateForm = () => {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,7 +39,7 @@ const SignUp = () => {
   };
 
   const submitHandler = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
     setFormSubmitted(true);
     if (!isOnline) {
       setErrors({ general: 'No internet connection. Please check your network.' });
@@ -51,16 +51,15 @@ const SignUp = () => {
       console.log('Form not validated', formErrors);
       return;
     }
-  
+
     try {
       setIsLoading(true)
-      const signupResponse = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, { username, email, password });
-      console.log(signupResponse)
-      const getusernameFromresponse = signupResponse;
+      const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, { username, email, password });
+      console.log(response)
+      const getusernameFromresponse = response;
       console.log(getusernameFromresponse.data)
-      console.log(signupResponse.data.success)
-      if (signupResponse.data.success) {
-
+      console.log(response.data.success)
+      if (response.data.success) {
         homePage('/');
       } else {
         setErrors({
@@ -68,37 +67,35 @@ const SignUp = () => {
         });
       }
     } catch (error) {
-      console.error('Registration failed:', error);
-  
-      if (error.response.status === 400) {
-        setErrors({
-          emailExist: error.response.data.msg,
-        });
-      } else {
-        setErrors({
-          general: 'Something went wrong. Please try again later.',
-        });
+      console.log(error.response)
+      if (error.response?.status === 400) {
+        console.log(error.response.status)
+        setErrors({ emailExist: error.response.data.msg });
       }
+      else {
+        setErrors({ general: 'Failed Check your Internet Connection!!!' });
+      }
+      console.error('Registration failed:', error);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   let passwordVisibilityHandler = () => {
     setPasswordVisible(!passwordVisible)
   }
 
   useEffect(() => {
-          const updateOnlineStatus = () => setIsOnline(navigator.onLine);
-  
-          window.addEventListener('online', updateOnlineStatus);
-          window.addEventListener('offline', updateOnlineStatus);
-  
-          return () => {
-              window.removeEventListener('online', updateOnlineStatus);
-              window.removeEventListener('offline', updateOnlineStatus);
-          };
-      }, []);
+    const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    return () => {
+      window.removeEventListener('online', updateOnlineStatus);
+      window.removeEventListener('offline', updateOnlineStatus);
+    };
+  }, []);
 
   return (
     <>
@@ -120,9 +117,16 @@ const SignUp = () => {
           <div className="flex h-full">
             <div className="signup-form h-full max-w-[600px] w-full md:ml-10 ml-0 mr-auto md:px-10 md:p-2">
               <form onSubmit={submitHandler}>
+                {/*show email exist error */}
                 {errors.emailExist && (
                   <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">
                     {errors.emailExist}
+                  </div>
+                )}
+                {/*show general error */}
+                {errors.general && (
+                  <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">
+                    {errors.general}
                   </div>
                 )}
                 <div className="md:py-6 py-1 md:mt-0 -mt-4  text-[2rem] underline text-center font-bold text-black">
@@ -230,10 +234,10 @@ const SignUp = () => {
                 </div>
                 {/* Submit Button */}
                 <div className="py-3">
-                  <button className={`${theme === 'light' ? 'bg-black text-white'  :'bg-white text-black'} rounded-[30px] text-center  h-[58px] text-[18px] font-bold w-full 
+                  <button className={`${theme === 'light' ? 'bg-black text-white' : 'bg-white text-black'} rounded-[30px] text-center  h-[58px] text-[18px] font-bold w-full 
                     ${isLoading ? 'opacity-50 cursor-not-allowed ' : ''}`}
                     disabled={isLoading || !isOnline} >
-                    {isLoading ? <CircularProgress  size={24} color="inherit"/> : 'Create Account'}
+                    {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Create Account'}
                   </button>
                 </div>
                 <div>

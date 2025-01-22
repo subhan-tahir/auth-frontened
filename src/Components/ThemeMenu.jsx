@@ -63,7 +63,7 @@ const ThemeMenu = () => {
           MenuListProps={{
             'aria-labelledby': 'basic-button',
           }}
-          sx={{ top: '10px', width: '100%' }}
+          sx={{ top: '10px', width: '390px' }}
         >
           <MenuItem
             onClick={() => handleThemeChange('light')}

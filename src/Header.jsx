@@ -36,12 +36,11 @@ const Header = () => {
         <>
             {/* Apply the theme dynamically using the context */}
             <div
-                className={`w-full h-[90px] z-50 absolute top-0  border-b flex justify-between items-center p-4 gap-5 transition-colors duration-300 ${
-                    theme === 'dark' ? 'bg-black text-white  border-white' : 'bg-white text-black border-b-black'
-                }`}
+                className={`w-full h-[90px] z-50 absolute top-0  border-b flex justify-between items-center p-4 gap-5 transition-colors duration-300 ${theme === 'dark' ? 'bg-black text-white  border-white' : 'bg-white text-black border-b-black'
+                    }`}
             >
                 {/* Display Username */}
-                <div>
+                <div className='flex-1'>
                     <h1 className="md:text-[1.8rem] text-[1rem]">
                         {user ? (
                             <span className="font-bold">Welcome, {user.slice(0, 30)}!</span>
@@ -52,8 +51,8 @@ const Header = () => {
                 </div>
 
                 {/* Navigation Menu */}
-                <div className="flex">
-                    <ul className="sm:gap-[3rem] flex-1 font-[600] font-sans md:flex hidden items-center">
+                <div className="md:flex hidden">
+                    <ul className="sm:gap-[3rem] flex-1 font-[600] font-sans flex  items-center">
                         {menu.map((items, index) => (
                             <Link to={items.href} key={index}>
                                 <li
@@ -66,28 +65,32 @@ const Header = () => {
                     </ul>
                 </div>
 
-                <div className="gap-3 items-center justify-center flex">
+                <div className="">
+
                     <Link to="/login" className="md:flex hidden">
+
                         <button
-                            className={`cursor-pointer hover:text-gray-400 transition-all duration-300 ease-in-out font-bold rounded-[35px] px-4 py-2 border ${
-                                theme === 'dark'
+                            className={`cursor-pointer hover:text-gray-400 transition-all duration-300 ease-in-out font-bold rounded-[35px] px-4 py-2 border ${theme === 'dark'
                                     ? 'bg-white text-black hover:bg-gray-100'
                                     : 'bg-black text-white hover:bg-gray-800'
-                            }`}
+                                }`}
                             onClick={logoutHandler}
                         >
                             Log out
                         </button>
                     </Link>
-                    <div>
+                    
+                </div>
+                <div className='flex items-center'>
+                <div>
                         <ThemeMenu />
                     </div>
-                </div>
-
                 {/* Mobile Menu Button */}
                 <Button onClick={() => toggleDrawer(true)} className="md:!hidden flex">
                     <MenuIcon sx={{ fontSize: 40, color: theme === 'dark' ? 'white' : 'black' }} />
                 </Button>
+
+                </div>
             </div>
 
             {/* Sidebar Component */}

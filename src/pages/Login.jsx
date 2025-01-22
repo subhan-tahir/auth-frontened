@@ -66,17 +66,19 @@ const Login = () => {
                 console.log('Login successful:', username);
                 localStorage.setItem('username', username);
                 navigate('/');
-            } else {
-                setErrors({ general: response.data.msg || 'Invalid login details' });
-            }
+             } 
+            // else {
+            //     setErrors({ general: response.data.msg || 'Invalid login details' });
+            // }
         } catch (error) {
-            console.error('Login failed:', error);
-
-
-            setErrors({
-                general: 'Invalid email and password',
-            });
-
+            console.log(error.response)
+            if (error.response?.status === 401) {
+                console.log(error.response)
+                setErrors({ general: error.response.data.msg || 'Unauthorized. Check your login credentials.' });
+            }  else {
+                setErrors({ general: 'Login failed Check your Internet Connection' });
+            }
+            console.error('Login error:', error);
         }
         finally {
             setIsLoading(false); // Ensure the loader is stopped in all cases
