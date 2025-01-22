@@ -54,6 +54,7 @@ const SignUp = () => {
 
     try {
       setIsLoading(true)
+      const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}employees`, { username, email, password });
       console.log(response)
       const getusernameFromresponse = response;
       console.log(getusernameFromresponse.data)
