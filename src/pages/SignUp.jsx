@@ -54,9 +54,8 @@ const SignUp = () => {
 
     try {
       setIsLoading(true)
-      const signupResponse = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, { username, email, password });
-      console.log(signupResponse)
-      const getusernameFromresponse = signupResponse;
+      console.log(response)
+      const getusernameFromresponse = response;
       console.log(getusernameFromresponse.data)
       console.log(response.data.success)
       if (response.data.success) {
