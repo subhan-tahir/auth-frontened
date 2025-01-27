@@ -48,22 +48,13 @@ const SignUp = () => {
         return;
     }
     try {
-      setIsLoading(true);
-      const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, {
-        username,
-        email,
-        password,
-      });
-
-      if (response?.data?.success) {
-        navigate('/'); // Redirect to the home page
-        const token = response.data.token.token; // Extract the token from the response
-        const exptime = response.data.token.exptime; // Extract expiration time from the response
-        const tokenData = { token, exptime }; // Consistent token structure
-        // Store username and token in localStorage
-        localStorage.setItem('username', response.data.data.username);
-        localStorage.setItem('token', JSON.stringify(tokenData)); // Save as JSON
-        console.log('User registered successfully!');
+      setIsLoading(true)
+      console.log(response)
+      const getusernameFromresponse = response;
+      console.log(getusernameFromresponse.data)
+      console.log(response.data.success)
+      if (response.data.success) {
+        homePage('/');
       } else {
         setErrors({
           emailExist: response.data.msg || 'An account with that email already exists.',
