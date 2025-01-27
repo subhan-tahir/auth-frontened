@@ -61,7 +61,7 @@ const Login = () => {
         try {
         setIsLoading(true); // Start spinner
              // await new Promise((resolve) => setTimeout(resolve, 2000)); 
-            const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/login`, { email, password });
+            const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}login`, { email, password });
              console.log(response)
             if (response?.data?.success) {
                 navigate('/');
