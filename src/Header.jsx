@@ -4,12 +4,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import Sidebar from './Components/Sidebar';
 import ThemeMenu from './Components/ThemeMenu';
-import { ThemeContext } from './context/ThemeContext'; // Import ThemeContext
+import { ThemeProvider } from './context/ThemeContext'; // Import ThemeContext
 
 const Header = () => {
     const [user, setUser] = useState('');
     const [open, setOpen] = useState(false);
-    const { theme } = useContext(ThemeContext); // Access the theme from context
+    const { theme } = useContext(ThemeProvider); // Access the theme from context
 
     useEffect(() => {
         const storedUser = localStorage.getItem('username');
@@ -17,7 +17,7 @@ const Header = () => {
     }, []);
 
     const logoutHandler = () => {
-        localStorage.removeItem('username');
+        localStorage.removeItem('token');
         console.log('User logged out');
     };
 

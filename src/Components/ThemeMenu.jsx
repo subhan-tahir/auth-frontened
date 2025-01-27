@@ -6,13 +6,13 @@ import ExpandMoreSharpIcon from '@mui/icons-material/ExpandMoreSharp';
 import LightModeSharpIcon from '@mui/icons-material/LightModeSharp';
 import DarkModeSharpIcon from '@mui/icons-material/DarkModeSharp';
 import { Box } from '@mui/material';
-import { ThemeContext } from '../context/ThemeContext';
+import {ThemeProvider } from '../context/ThemeContext';
 
 
 const ThemeMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const { theme, setTheme } = useContext(ThemeContext); // Access theme and setTheme
+  const { theme, setTheme } = useContext(ThemeProvider); // Access theme and setTheme
 
   function handleClick(event) {
     setAnchorEl(event.currentTarget);
@@ -30,30 +30,33 @@ const ThemeMenu = () => {
 
   return (
     <div>
-    <Button
-  id="basic-button"
-  aria-controls={open ? 'basic-menu' : undefined}
-  aria-haspopup="true"
-  aria-expanded={open ? 'true' : undefined}
-  onClick={handleClick}
-  sx={{
-    color: theme === 'light' ? 'white' : 'black',
-    backgroundColor: theme === 'light' ? 'black' : 'white',
-    display: 'flex',
-    gap: '5px',
-    borderRadius: '20px',
-    paddingInline: '15px',
-    paddingBlock: '7px',
-  }}
->
-  {theme === 'light' ? 'Light' : 'Dark'}
-  <ExpandMoreSharpIcon
-    sx={{
-      transform: open ? 'rotate(180deg)' : 'rotate(0deg)', // Corrected rotation logic
-      transition: 'transform 0.3s ease', // Smooth transition for the rotation
-    }}
-  />
-</Button>
+      {/*menu button */}
+      <Button
+        id="basic-button"
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+        sx={{
+          color: theme === 'light' ? 'white' : 'black',
+          backgroundColor: theme === 'light' ? 'black' : 'white',
+          display: 'flex',
+          gap: '5px',
+          borderRadius: '20px',
+          paddingInline: '15px',
+          paddingBlock: '7px',
+        }}
+      >
+        {theme === 'light' ? 'Light' : 'Dark'}
+        <ExpandMoreSharpIcon
+          sx={{
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)', // Corrected rotation logic
+            transition: 'transform 0.3s ease', // Smooth transition for the rotation
+          }}
+        />
+      </Button>
+
+      {/*theme menu */}
       <Box sx={{ width: '' }}>
         <Menu
           id="basic-menu"

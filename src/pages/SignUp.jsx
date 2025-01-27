@@ -6,8 +6,9 @@ import { FaCircleCheck } from 'react-icons/fa6';
 import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
 import axios from 'axios';
-import { CircularProgress } from '@mui/material'; // Material UI spinner
-import { ThemeContext } from '@emotion/react';
+import { CircularProgress } from '@mui/material';
+
+import { ThemeProvider } from '../context/ThemeContext';
 
 const SignUp = () => {
   const [username, setUserName] = useState('');
@@ -18,8 +19,8 @@ const SignUp = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const homePage = useNavigate();
-  const { theme } = useContext(ThemeContext);
+  const navigate = useNavigate();
+  const { theme } = useContext(ThemeProvider);
   const validateForm = () => {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,46 +40,47 @@ const SignUp = () => {
   };
 
   const submitHandler = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
     setFormSubmitted(true);
-    if (!isOnline) {
-      setErrors({ general: 'No internet connection. Please check your network.' });
-      return;
-    }
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
-      console.log('Form not validated', formErrors);
-      return;
+        setErrors(formErrors);
+        return;
     }
-
     try {
-      setIsLoading(true)
-      console.log(response)
-      const getusernameFromresponse = response;
-      console.log(getusernameFromresponse.data)
-      console.log(response.data.success)
-      if (response.data.success) {
-        homePage('/');
+      setIsLoading(true);
+      const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, {
+        username,
+        email,
+        password,
+      });
+
+      if (response?.data?.success) {
+        navigate('/'); // Redirect to the home page
+        const token = response.data.token.token; // Extract the token from the response
+        const exptime = response.data.token.exptime; // Extract expiration time from the response
+        const tokenData = { token, exptime }; // Consistent token structure
+        // Store username and token in localStorage
+        localStorage.setItem('username', response.data.data.username);
+        localStorage.setItem('token', JSON.stringify(tokenData)); // Save as JSON
+        console.log('User registered successfully!');
       } else {
         setErrors({
-          emailExist: response.data.msg || 'An account with that email address already exists. Please log in to continue.',
+          emailExist: response.data.msg || 'An account with that email already exists.',
         });
       }
     } catch (error) {
-      console.log(error.response)
       if (error.response?.status === 400) {
-        console.log(error.response.status)
         setErrors({ emailExist: error.response.data.msg });
-      }
-      else {
-        setErrors({ general: 'Failed Check your Internet Connection!!!' });
+      } else {
+        setErrors({ general: 'Registration failed' });
       }
       console.error('Registration failed:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   let passwordVisibilityHandler = () => {
     setPasswordVisible(!passwordVisible)
@@ -116,6 +118,14 @@ const SignUp = () => {
           <div className="flex h-full">
             <div className="signup-form h-full max-w-[600px] w-full md:ml-10 ml-0 mr-auto md:px-10 md:p-2">
               <form onSubmit={submitHandler}>
+                {/*show error if user offline or online*/}
+
+                {!isOnline && (
+                  <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">
+                    You are offline. Please check your internet connection.
+                  </div>
+                )}
+
                 {/*show email exist error */}
                 {errors.emailExist && (
                   <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">
@@ -233,7 +243,7 @@ const SignUp = () => {
                 </div>
                 {/* Submit Button */}
                 <div className="py-3">
-                  <button className={`${theme === 'light' ? 'bg-black text-white' : 'bg-white text-black'} rounded-[30px] text-center  h-[58px] text-[18px] font-bold w-full 
+                  <button className={`${theme === 'light' ? '!bg-black text-white' : 'bg-white text-black'} rounded-[30px] text-center  h-[58px] text-[18px] font-bold w-full 
                     ${isLoading ? 'opacity-50 cursor-not-allowed ' : ''}`}
                     disabled={isLoading || !isOnline} >
                     {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Create Account'}

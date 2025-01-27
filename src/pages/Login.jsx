@@ -8,7 +8,8 @@ import { FaEyeSlash } from "react-icons/fa";
 import { CircularProgress } from '@mui/material'; // Material UI spinner
 import axios from 'axios';
 import { useContext } from 'react';
-import { ThemeContext } from '../context/ThemeContext';
+// import { ThemeContext } from '../context/ThemeContext';
+import {  ThemeProvider } from '../context/ThemeContext';
 
 const Login = () => {
     const [password, setPassword] = useState('');
@@ -20,7 +21,8 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false); // Spinner state
 
     const navigate = useNavigate();
-    const { theme } = useContext(ThemeContext);
+    // const { theme } = useContext(ThemeContext);
+    const { theme } = useContext(ThemeProvider);
     const validateForm = () => {
         const newErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,13 +61,21 @@ const Login = () => {
         try {
         setIsLoading(true); // Start spinner
              // await new Promise((resolve) => setTimeout(resolve, 2000)); 
-            const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}login`, { email, password });
-             
+            const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/login`, { email, password });
+             console.log(response)
             if (response?.data?.success) {
-                const username = response.data.data.username;
-                console.log('Login successful:', username);
-                localStorage.setItem('username', username);
                 navigate('/');
+                const token = response.data.token.token;
+                const expiryTime = response.data.token.exptime;
+                console.log(expiryTime)
+                const tokenData = {
+                    token: token,
+                    exptime: expiryTime,
+                  };
+                  
+                const username = response.data.data.username;
+                localStorage.setItem('username', username);
+                localStorage.setItem('token', JSON.stringify(tokenData));
              } 
             // else {
             //     setErrors({ general: response.data.msg || 'Invalid login details' });
@@ -76,7 +86,7 @@ const Login = () => {
                 console.log(error.response)
                 setErrors({ general: error.response.data.msg || 'Unauthorized. Check your login credentials.' });
             }  else {
-                setErrors({ general: 'Login failed Check your Internet Connection' });
+                setErrors({ general: 'Login failed' });
             }
             console.error('Login error:', error);
         }
