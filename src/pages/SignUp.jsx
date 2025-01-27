@@ -49,7 +49,7 @@ const SignUp = () => {
     }
     try {
       setIsLoading(true);
-      const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}employees`, {
+      const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, {
         username,
         email,
         password,
