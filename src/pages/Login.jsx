@@ -48,7 +48,7 @@ const Login = () => {
     setFormSubmitted(true);
 
     if (!isOnline) {
-      toast.error("No internet connection. Please check your network.");
+      toast.error("No internet connection. Please check your network");
       setErrors({
         general: "No internet connection. Please check your network.",
       });
