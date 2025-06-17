@@ -1,40 +1,41 @@
-import React, { useState, useEffect, useContext } from 'react';
-import authVideo from '../assets/signupFormVideo.mp4';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaExclamationCircle } from 'react-icons/fa';
-import { FaCircleCheck } from 'react-icons/fa6';
+import React, { useState, useEffect, useContext } from "react";
+import authVideo from "../assets/signupFormVideo.mp4";
+import { Link, useNavigate } from "react-router-dom";
+import { FaExclamationCircle } from "react-icons/fa";
+import { FaCircleCheck } from "react-icons/fa6";
 import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
-import axios from 'axios';
-import { CircularProgress } from '@mui/material';
+import axios from "axios";
+import { CircularProgress } from "@mui/material";
 
-import { ThemeProvider } from '../context/ThemeContext';
+import { ThemeContext } from "../context/ThemeContext";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
-  const [username, setUserName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const navigate = useNavigate();
-  const { theme } = useContext(ThemeProvider);
+  const { theme } = useContext(ThemeContext);
   const validateForm = () => {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!username) newErrors.username = 'Enter your name';
+    if (!username) newErrors.username = "Enter your name";
     if (!email) {
-      newErrors.email = 'Email is required.';
+      newErrors.email = "Email is required.";
     } else if (!emailRegex.test(email)) {
-      newErrors.email = 'Enter a valid email address.';
+      newErrors.email = "Enter a valid email address.";
     }
     if (!password) {
-      newErrors.password = 'Password is required.';
+      newErrors.password = "Password is required.";
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters.';
+      newErrors.password = "Password must be at least 6 characters.";
     }
     return newErrors;
   };
@@ -44,57 +45,63 @@ const SignUp = () => {
     setFormSubmitted(true);
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
-        setErrors(formErrors);
-        return;
+      setErrors(formErrors);
+      toast.error("All fields are required.");
+      return;
     }
     try {
       setIsLoading(true);
-      const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`, {
-        username,
-        email,
-        password,
-      });
-
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_BACKEND_BASE_URL}/employees`,
+        {
+          username,
+          email,
+          password,
+        }
+      );
+      console.log("signup response...", response);
+      console.log("signup response data...", response.data.user.email);
       if (response?.data?.success) {
-        navigate('/'); // Redirect to the home page
-        const token = response.data.token.token; // Extract the token from the response
-        const exptime = response.data.token.exptime; // Extract expiration time from the response
-        const tokenData = { token, exptime }; // Consistent token structure
+        // const token = response.data.token.token; // Extract the token from the response
+        // const exptime = response.data.token.exptime; // Extract expiration time from the response
+        // const tokenData = { token, exptime }; // Consistent token structure
         // Store username and token in localStorage
-        localStorage.setItem('username', response.data.data.username);
-        localStorage.setItem('token', JSON.stringify(tokenData)); // Save as JSON
-        console.log('User registered successfully!');
+        localStorage.setItem("username", response.data.user.username);
+        localStorage.setItem("email", response.data.user.email);
+        // localStorage.setItem("token", JSON.stringify(tokenData)); // Save as JSON
+        console.log("User registered successfully!");
+        navigate("/verify-email"); // Redirect to the home page
       } else {
         setErrors({
-          emailExist: response.data.msg || 'An account with that email already exists.',
+          emailExist:
+            response.data.msg || "An account with that email already exists.",
         });
       }
     } catch (error) {
       if (error.response?.status === 400) {
         setErrors({ emailExist: error.response.data.msg });
       } else {
-        setErrors({ general: 'Registration failed' });
+        setErrors({ general: "Registration failed" });
       }
-      console.error('Registration failed:', error);
+      console.error("Registration failed:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-
   let passwordVisibilityHandler = () => {
-    setPasswordVisible(!passwordVisible)
-  }
+    setPasswordVisible(!passwordVisible);
+  };
 
   useEffect(() => {
     const updateOnlineStatus = () => setIsOnline(navigator.onLine);
 
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
 
     return () => {
-      window.removeEventListener('online', updateOnlineStatus);
-      window.removeEventListener('offline', updateOnlineStatus);
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
     };
   }, []);
 
@@ -141,15 +148,24 @@ const SignUp = () => {
                 <div className="md:py-6 py-1 md:mt-0 -mt-4  text-[2rem] underline text-center font-bold text-black">
                   <h1>Sign Up Now</h1>
                 </div>
+
                 {/* Username Field */}
                 <div className="form-field-group gap-5 flex justify-between md:flex-nowrap flex-wrap">
                   <div className="form-field py-3 w-full">
-                    <label htmlFor="username" className="font-bold text-[20px] pb-5">
+                    <label
+                      htmlFor="username"
+                      className="font-bold text-[20px] pb-5"
+                    >
                       Username
                     </label>
                     <div
-                      className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${errors.username ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
-                        }`}
+                      className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${
+                        errors.username
+                          ? "border-red-500"
+                          : formSubmitted
+                          ? "border-green-500"
+                          : ""
+                      }`}
                     >
                       <input
                         type="text"
@@ -168,17 +184,27 @@ const SignUp = () => {
                         </span>
                       )}
                     </div>
-                    {errors.username && <p className="text-red-500 block w-full text-sm">{errors.username}</p>}
+                    {errors.username && (
+                      <p className="text-red-500 block w-full text-sm">
+                        {errors.username}
+                      </p>
+                    )}
                   </div>
                 </div>
+
                 {/* Email Field */}
                 <div className="form-field py-3">
                   <label htmlFor="email" className="font-bold text-[20px] pb-5">
                     Email
                   </label>
                   <div
-                    className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${errors.email ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
-                      }`}
+                    className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${
+                      errors.email
+                        ? "border-red-500"
+                        : formSubmitted
+                        ? "border-green-500"
+                        : ""
+                    }`}
                   >
                     <input
                       type="text"
@@ -198,25 +224,41 @@ const SignUp = () => {
                       </span>
                     )}
                   </div>
-                  {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+                  {errors.email && (
+                    <p className="text-red-500 text-sm">{errors.email}</p>
+                  )}
                 </div>
+
                 {/* Password Field */}
                 <div className="form-field py-3">
-                  <label htmlFor="password" className="font-bold text-[20px] pb-5">
+                  <label
+                    htmlFor="password"
+                    className="font-bold text-[20px] pb-5"
+                  >
                     Password
                   </label>
                   <div
-                    className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${errors.password ? 'border-red-500' : formSubmitted ? 'border-green-500' : ''
-                      }`}
+                    className={`flex items-center rounded-[12px] py-[18px] px-[20px] border ${
+                      errors.password
+                        ? "border-red-500"
+                        : formSubmitted
+                        ? "border-green-500"
+                        : ""
+                    }`}
                   >
                     <input
-                      type={`${passwordVisible ? 'text' : 'password'}`}
+                      type={`${passwordVisible ? "text" : "password"}`}
                       id="password"
                       className="border-0 outline-none w-full bg-transparent"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
-                    <span className='cursor-pointer text-xl ' onClick={passwordVisibilityHandler}>{passwordVisible ? (<IoEye />) : (<FaEyeSlash />)}</span>
+                    <span
+                      className="cursor-pointer text-xl "
+                      onClick={passwordVisibilityHandler}
+                    >
+                      {passwordVisible ? <IoEye /> : <FaEyeSlash />}
+                    </span>
                     {formSubmitted && (
                       <span className="pl-2 text-xl">
                         {errors.password ? (
@@ -227,10 +269,13 @@ const SignUp = () => {
                       </span>
                     )}
                   </div>
-                  {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+                  {errors.password && (
+                    <p className="text-red-500 text-sm">{errors.password}</p>
+                  )}
                 </div>
+
                 {/* Checkbox */}
-                <div className="py-3 flex gap-2">
+                {/* <div className="py-3 flex gap-2">
                   <input
                     type="checkbox"
                     id="user_agree_to_terms"
@@ -240,19 +285,31 @@ const SignUp = () => {
                     I agree with devop's Terms of Service, Privacy Policy, and default
                     Notification Settings.
                   </label>
-                </div>
+                </div> */}
+
                 {/* Submit Button */}
                 <div className="py-3">
-                  <button className={`${theme === 'light' ? '!bg-black text-white' : 'bg-white text-black'} rounded-[30px] text-center  h-[58px] text-[18px] font-bold w-full 
-                    ${isLoading ? 'opacity-50 cursor-not-allowed ' : ''}`}
-                    disabled={isLoading || !isOnline} >
-                    {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Create Account'}
+                  <button
+                    className={`${
+                      theme === "light"
+                        ? "!bg-black text-white"
+                        : "bg-white text-black"
+                    } rounded-[30px] text-center hover:!bg-gray-300 hover:text-black transition-colors h-[58px] text-[18px] font-bold w-full 
+                    ${isLoading ? "opacity-50 cursor-not-allowed " : ""}`}
+                    disabled={isLoading || !isOnline}
+                  >
+                    {isLoading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      "Create Account"
+                    )}
                   </button>
                 </div>
+
                 <div>
                   <p className="text-center text-lg  mt-1">
-                    Already have an account?{' '}
-                    <Link to={'/login'} className=" underline">
+                    Already have an account?{" "}
+                    <Link to={"/login"} className=" underline">
                       Log In
                     </Link>
                   </p>
@@ -262,7 +319,6 @@ const SignUp = () => {
           </div>
         </section>
       </div>
-
     </>
   );
 };

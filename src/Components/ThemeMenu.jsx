@@ -6,13 +6,13 @@ import ExpandMoreSharpIcon from '@mui/icons-material/ExpandMoreSharp';
 import LightModeSharpIcon from '@mui/icons-material/LightModeSharp';
 import DarkModeSharpIcon from '@mui/icons-material/DarkModeSharp';
 import { Box } from '@mui/material';
-import {ThemeProvider } from '../context/ThemeContext';
+import {ThemeContext } from '../context/ThemeContext';
 
 
 const ThemeMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const { theme, setTheme } = useContext(ThemeProvider); // Access theme and setTheme
+  const { theme, setTheme } = useContext(ThemeContext); // Access theme and setTheme
 
   function handleClick(event) {
     setAnchorEl(event.currentTarget);

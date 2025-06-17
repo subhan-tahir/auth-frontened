@@ -1,31 +1,27 @@
 import React, { createContext, useState, useEffect } from 'react';
 
-// // Create a context for the theme
-export const ThemeProvider = createContext();
+// Create a context for the theme
+export const ThemeContext = createContext();
 
-const ThemeContext = ({ children }) => {
+const ThemeProvider = ({ children }) => {
   // Get the theme from localStorage or default to light
   const [theme, setTheme] = useState(localStorage.getItem("app-theme") || "light");
-  
-  // Update localStorage and body class when the theme changes
+
+  // Update localStorage and apply theme class to body
   useEffect(() => {
     localStorage.setItem("app-theme", theme);
-    
-    if (theme === 'dark') {
-      document.body.style.backgroundColor = '#000000'; 
-    document.body.style.color = '#ffffff'; 
-  } else {
-    document.body.style.backgroundColor = '#ffffff';
-    document.body.style.color = '#000000'; 
-  }
-  document.body.classList.add(theme);
-}, [theme]);
+    document.body.classList.remove("light", "dark"); // Remove previous theme classes
+    document.body.classList.add(theme);
 
-return (
-  <ThemeProvider.Provider value={{ theme, setTheme }}>
+    // Optional: Apply basic styles via CSS classes instead of direct manipulation
+    // These can be defined in a global CSS file
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
-    </ThemeProvider.Provider>
+    </ThemeContext.Provider>
   );
 };
 
-export default ThemeContext
+export default ThemeProvider;

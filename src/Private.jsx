@@ -1,26 +1,50 @@
-import React from 'react'
-import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import React from "react";
+import { useEffect } from "react";
+import { useState } from "react";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
-const Private = () => {
-  let navigate = useNavigate();
-    let tokenInJson = localStorage.getItem('token');
-    if(tokenInJson){
-      const {token , exptime} = JSON.parse(tokenInJson);
-      console.log('exptime---',token, exptime);
-      //currentTime represents the current time in milliseconds.
-      const currentTime = new Date().getTime();  // Current time in milliseconds
+const Private = ({ children: component }) => {
+  const navigate = useNavigate();
+  const tokenInJson = localStorage.getItem("token");
+const [isAuthenticated, setIsAuthenticated] = useState(false);
+  let token, exptime;
 
-      if (currentTime > exptime) {
-          localStorage.removeItem('token');
-          navigate('/login');
-        console.log('Token has expired');
-      } else {
-        console.log('Token is still valid');
-      }
+  if (tokenInJson) {
+    try {
+      const parsed = JSON.parse(tokenInJson);
+      token = parsed.token;
+      exptime = parsed.exptime;
+    } catch (error) {
+      console.error("Invalid token format in localStorage");
+      localStorage.removeItem("token");
+      return <Navigate to="/login" />;
     }
+  }
 
-  return <>{tokenInJson ? <Outlet /> : <Navigate to={'/login'} />}</>
-}
+  const publicRoutes = ["/login", "/signup"];
 
-export default Private
+  if (token && publicRoutes.includes(window.location.pathname)) {
+    navigate("/");
+  }
 
+  if (!token && !publicRoutes.includes(window.location.pathname)) {
+    navigate("/login");
+  }
+
+  if (token && exptime) {
+    const currentTime = new Date().getTime();
+    if (currentTime > exptime) {
+      localStorage.removeItem("token");
+      console.log("Token has expired");
+      navigate("/login");
+    } else {
+      console.log("Token is still valid");
+    }
+  }
+useEffect(() => {
+  console.log(token);
+})
+  return <>{token ? <Outlet /> : <Navigate to="/login" />}</>;
+};
+
+export default Private;

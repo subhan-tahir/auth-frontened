@@ -12,14 +12,14 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeContext } from './context/ThemeContext';
 
 const ProductCard = () => {
     const [products, setProducts] = useState([]);
     const [loader, setLoader] = useState(false);
     const [itemShow, setItemShow] = useState(5);
 
-    const {theme} = useContext(ThemeProvider);
+    const {theme} = useContext(ThemeContext);
     const fetchProducts = async () => {
         setLoader(true)
         const response = await axios.get('https://api.escuelajs.co/api/v1/products');
